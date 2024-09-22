@@ -1,36 +1,36 @@
 import 'dart:convert';
 import 'dart:ui';
-import 'package:agri/Homescreen.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:http/http.dart' as http;
-import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 
-class Login extends StatefulWidget {
+class Register extends StatefulWidget {
   @override
-  _LoginState createState() => _LoginState();
+  _RegisterState createState() => _RegisterState();
 }
 
-class _LoginState extends State<Login> {
+class _RegisterState extends State<Register> {
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
+  
   String _errorMessage = '';
 
-  Future<void> _login() async {
-    final username = _usernameController.text;
-    final password = _passwordController.text;
-
-    if (username.isEmpty || password.isEmpty) {
+  Future<void> _registerFarmer() async {
+    if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
-        _errorMessage = 'Please enter both username and password';
+        _errorMessage = 'Passwords do not match';
       });
       return;
     }
-    final url = Uri.parse('http://localhost:8080/farmer/login/');
+
+    final url = Uri.parse('http://localhost:8080/farmer/createFarmer/');
     final body = jsonEncode({
-      'username': username,
-      'password': password,
+      'firstName': _firstNameController.text,
+      'lastName': _lastNameController.text,
+      'username': _usernameController.text,
+      'password': _passwordController.text,
     });
 
     try {
@@ -43,16 +43,31 @@ class _LoginState extends State<Login> {
       );
 
       if (response.statusCode == 200) {
-        var box = await Hive.openBox('userBox');
-        box.put('username', username);
-        Navigator.pushReplacementNamed(context, '/home');
-      } else if (response.statusCode == 401) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Success'),
+              content: Text('Farmer registered successfully!'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); 
+                    Navigator.pushNamed(context, '/'); 
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else if (response.statusCode == 409) {
         setState(() {
-          _errorMessage = 'Invalid username or password';
+          _errorMessage = 'Username already exists';
         });
       } else {
         setState(() {
-          _errorMessage = 'Failed to login. Please try again. Status code: ${response.statusCode}';
+          _errorMessage = 'Failed to register. Please try again.';
         });
       }
     } catch (e) {
@@ -86,7 +101,7 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Agro',
+                    'Register',
                     style: TextStyle(
                       fontSize: 48,
                       fontWeight: FontWeight.bold,
@@ -94,14 +109,53 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   SizedBox(height: 40),
+                  
                   if (_errorMessage.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
+                      padding: EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
                         _errorMessage,
                         style: TextStyle(color: Colors.red),
                       ),
                     ),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: TextField(
+                      controller: _firstNameController,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'First Name',
+                        hintStyle: TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.2),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: Icon(Icons.person, color: Colors.white70),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: TextField(
+                      controller: _lastNameController,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Last Name',
+                        hintStyle: TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.2),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: Icon(Icons.person, color: Colors.white70),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40),
                     child: TextField(
@@ -120,6 +174,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
+              
                   SizedBox(height: 20),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 40),
@@ -140,6 +195,26 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
+                  SizedBox(height: 20),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    child: TextField(
+                      controller: _confirmPasswordController,
+                      obscureText: true,
+                      style: TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        hintText: 'Confirm Password',
+                        hintStyle: TextStyle(color: Colors.white70),
+                        filled: true,
+                        fillColor: Colors.white.withOpacity(0.2),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30),
+                          borderSide: BorderSide.none,
+                        ),
+                        prefixIcon: Icon(Icons.lock, color: Colors.white70),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: 40),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -149,39 +224,21 @@ class _LoginState extends State<Login> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    onPressed: _login,
-                    child: Text(
-                      'Login',
-                      style: TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                  SizedBox(height: 20),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade500,
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/register');
-                    },
+                    onPressed: _registerFarmer,
                     child: Text(
                       'Register',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 60),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FaIcon(FontAwesomeIcons.facebook, color: Colors.white),
-                      SizedBox(width: 20),
-                      FaIcon(FontAwesomeIcons.twitter, color: Colors.white),
-                      SizedBox(width: 20),
-                      FaIcon(FontAwesomeIcons.instagram, color: Colors.white),
-                    ],
+                  SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/');
+                    },
+                    child: Text(
+                      'Already have an account? Login',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
