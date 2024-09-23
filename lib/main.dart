@@ -1,12 +1,34 @@
-import 'package:agri/Homescreen.dart';
 import 'package:flutter/material.dart';
-import 'login.dart'; 
+import 'package:hive/hive.dart';
+import 'package:path_provider/path_provider.dart';
+import 'login.dart';
+import 'Homescreen.dart';
+import 'Register.dart';
 
-void main() {
-  runApp(MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    final dir = await getApplicationDocumentsDirectory();
+    Hive.init(dir.path);
+    await Hive.openBox('userBox');
+    
+    var box = Hive.box('userBox');
+    String? username = box.get('username');
+    
+    runApp(MyApp(isLoggedIn: username != null));
+  } catch (e) {
+    // Handle initialization errors
+    runApp(MyApp(isLoggedIn: false)); // You can change this behavior
+    print("Error initializing Hive: $e");
+  }
 }
 
 class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  MyApp({required this.isLoggedIn});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -15,10 +37,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
+      initialRoute: isLoggedIn ? '/home' : '/',
       routes: {
-        '/': (context) => Homescreen(),
-        '/home': (context) =>const  Homescreen(), 
+        '/': (context) => Login(),
+        '/home': (context) => Homescreen(),
+        '/register': (context) => Register(),
       },
     );
   }
