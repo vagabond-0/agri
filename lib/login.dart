@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:agri/Homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,7 +24,8 @@ class _LoginState extends State<Login> {
 
     if (username.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = 'Please enter both username and password';
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Please enter both username and password")));
       });
       return;
     }
@@ -48,16 +50,21 @@ class _LoginState extends State<Login> {
         Navigator.pushReplacementNamed(context, '/home');
       } else if (response.statusCode == 401) {
         setState(() {
-          _errorMessage = 'Invalid username or password';
+          // _errorMessage = 'Invalid username or password';
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("Invalid username or password")));
         });
       } else {
         setState(() {
-          _errorMessage = 'Failed to login. Please try again. Status code: ${response.statusCode}';
+          _errorMessage =
+              'Failed to login. Please try again. Status code: ${response.statusCode}';
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Error connecting to the server. Please try again later.';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text(
+                "Error connecting to the server. Please try again later.")));
       });
     }
   }
@@ -69,15 +76,17 @@ class _LoginState extends State<Login> {
         fit: StackFit.expand,
         children: [
           Positioned.fill(
-            child: Image.asset(
-              'assets/images/background.jpg',
-              fit: BoxFit.cover,
-            ),
-          ),
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
             child: Container(
-              color: Colors.black.withOpacity(0.3),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color.fromRGBO(0, 255, 0, 0.4),
+                    Color.fromRGBO(30, 100, 35, 1),
+                  ],
+                ),
+              ),
             ),
           ),
           Center(
@@ -85,14 +94,10 @@ class _LoginState extends State<Login> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(
-                    'Agro',
-                    style: TextStyle(
-                      fontSize: 48,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
+                  Text('Agro',
+                      style: GoogleFonts.lobster(
+                          color: const Color.fromARGB(255, 204, 244, 198),
+                          fontSize: 58)),
                   SizedBox(height: 40),
                   if (_errorMessage.isNotEmpty)
                     Padding(
@@ -143,8 +148,9 @@ class _LoginState extends State<Login> {
                   SizedBox(height: 40),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade700,
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      backgroundColor: const Color.fromARGB(255, 67, 180, 73),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -158,8 +164,9 @@ class _LoginState extends State<Login> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green.shade500,
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      backgroundColor: const Color.fromARGB(255, 67, 180, 73),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
