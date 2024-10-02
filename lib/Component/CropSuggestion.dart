@@ -40,7 +40,7 @@ class _CropSuggestionState extends State<CropSuggestion> {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align text to start
+        crossAxisAlignment: CrossAxisAlignment.start, 
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -60,18 +60,21 @@ class _CropSuggestionState extends State<CropSuggestion> {
               ),
             ],
           ),
-          const SizedBox(height: 16), // Space between the row and the scrollable list
+          const SizedBox(height: 16), 
 
-          // Horizontal scrollable list of crop suggestions
+         
           SizedBox(
-            height: 150, // Fixed height for the crop cards
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal, // Horizontal scrolling
-              itemCount: crops.length,
-              itemBuilder: (context, index) {
-                final crop = crops[index];
-                return cropCard(crop);
-              },
+            height: 200, 
+            child: Expanded(
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: crops.length,
+                itemBuilder: (context, index) {
+                  final crop = crops[index];
+                  return cropCard(crop);
+                },
+              ),
             ),
           ),
         ],
@@ -79,27 +82,27 @@ class _CropSuggestionState extends State<CropSuggestion> {
     );
   }
 
-  // Reusable function to create crop cards
   Widget cropCard(Crop crop) {
     return Container(
-      width: 120, // Fixed width for each crop card
-      margin: const EdgeInsets.only(right: 16), // Space between cards
+      width: 120, 
+      height: 200,
+      margin: const EdgeInsets.only(right: 16), 
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.lightBlueAccent, // Set a default background color
+        color: Colors.lightBlueAccent, 
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.wb_sunny, // Sun icon for temperature
+            Icons.wb_sunny, 
             size: 40,
             color: Colors.white,
           ),
           const SizedBox(height: 8),
           Text(
-            crop.cropName, // Crop name
+            crop.cropName, 
             style: const TextStyle(
               fontSize: 18,
               color: Colors.white,
@@ -108,7 +111,7 @@ class _CropSuggestionState extends State<CropSuggestion> {
           ),
           const SizedBox(height: 8),
           Text(
-            "${crop.weatherStart}°C - ${crop.weatherEnd}°C", // Weather range for the crop
+            "${crop.weatherStart}°C - ${crop.weatherEnd}°C", 
             style: const TextStyle(
               fontSize: 16,
               color: Colors.white,
@@ -116,7 +119,7 @@ class _CropSuggestionState extends State<CropSuggestion> {
           ),
           const SizedBox(height: 4),
           Text(
-            "Time: ${crop.timeRequiredForHarvest} days", // Time to harvest
+            "Time: ${crop.timeRequiredForHarvest} days", 
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,
