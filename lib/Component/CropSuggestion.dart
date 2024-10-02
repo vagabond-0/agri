@@ -1,15 +1,46 @@
+import 'dart:convert';
+import 'package:agri/models/CropModel.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 
-class CropSuggestion extends StatelessWidget {
-  const CropSuggestion({super.key});
+class CropSuggestion extends StatefulWidget {
+  const CropSuggestion({Key? key}) : super(key: key);
+
+  @override
+  _CropSuggestionState createState() => _CropSuggestionState();
+}
+
+class _CropSuggestionState extends State<CropSuggestion> {
+  List<Crop> crops = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCrops();
+  }
+
+  Future<void> fetchCrops() async {
+    final response = await http.get(
+      Uri.parse('http://localhost:8080/crop/suggestionByWeatherAndMonth?weather=25&month=2024-08-15'),
+    );
+
+    if (response.statusCode == 200) {
+      List jsonResponse = json.decode(response.body);
+      setState(() {
+        crops = jsonResponse.map((crop) => Crop.fromJson(crop)).toList();
+      });
+    } else {
+      throw Exception('Failed to load crops');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start, // Align text to start
+        crossAxisAlignment: CrossAxisAlignment.start, 
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -19,7 +50,6 @@ class CropSuggestion extends StatelessWidget {
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
                     fontSize: 15,
-                
                   ),
                 ),
               ),
@@ -30,20 +60,21 @@ class CropSuggestion extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 16), // Space between the row and the scrollable list
+          const SizedBox(height: 16), 
 
-          // Horizontal scrollable list of crop suggestions
+         
           SizedBox(
-            height: 150, // Fixed height for the crop cards
-            child: ListView(
-              scrollDirection: Axis.horizontal, // Horizontal scrolling
-              children: [
-                cropCard("Wheat", "25°C", Colors.orangeAccent),
-                cropCard("Rice", "30°C", Colors.lightBlueAccent),
-                cropCard("Corn", "28°C", Colors.greenAccent),
-                cropCard("Barley", "24°C", Colors.pinkAccent),
-                cropCard("Soybean", "27°C", Colors.purpleAccent),
-              ],
+            height: 200, 
+            child: Expanded(
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                shrinkWrap: true,
+                itemCount: crops.length,
+                itemBuilder: (context, index) {
+                  final crop = crops[index];
+                  return cropCard(crop);
+                },
+              ),
             ),
           ),
         ],
@@ -51,27 +82,27 @@ class CropSuggestion extends StatelessWidget {
     );
   }
 
-  // Reusable function to create crop cards
-  Widget cropCard(String cropName, String temperature, Color bgColor) {
+  Widget cropCard(Crop crop) {
     return Container(
-      width: 120, // Fixed width for each crop card
-      margin: const EdgeInsets.only(right: 16), // Space between cards
+      width: 120, 
+      height: 200,
+      margin: const EdgeInsets.only(right: 16), 
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: bgColor, // Background color based on crop
+        color: Colors.lightBlueAccent, 
         borderRadius: BorderRadius.circular(10),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(
-            Icons.wb_sunny, // Sun icon for temperature
+            Icons.wb_sunny, 
             size: 40,
             color: Colors.white,
           ),
           const SizedBox(height: 8),
           Text(
-            cropName, // Crop name
+            crop.cropName, 
             style: const TextStyle(
               fontSize: 18,
               color: Colors.white,
@@ -80,9 +111,17 @@ class CropSuggestion extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            temperature, // Temperature for the crop
+            "${crop.weatherStart}°C - ${crop.weatherEnd}°C", 
             style: const TextStyle(
               fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            "Time: ${crop.timeRequiredForHarvest} days", 
+            style: const TextStyle(
+              fontSize: 14,
               color: Colors.white,
             ),
           ),

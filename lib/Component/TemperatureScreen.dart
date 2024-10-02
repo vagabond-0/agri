@@ -12,7 +12,6 @@ class Temperaturescreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-            
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(16.0),
