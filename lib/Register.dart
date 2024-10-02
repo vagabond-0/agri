@@ -28,8 +28,8 @@ class _RegisterState extends State<Register> {
 
     final url = Uri.parse('http://localhost:8080/farmer/createFarmer/');
     final body = jsonEncode({
-      'firstName': _firstNameController.text,
-      'lastName': _lastNameController.text,
+      'farmerFirstName': _firstNameController.text,
+      'farmerLastName': _lastNameController.text,
       'username': _usernameController.text,
       'password': _passwordController.text,
     });
