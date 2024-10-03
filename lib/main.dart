@@ -18,8 +18,7 @@ Future<void> main() async {
     
     runApp(MyApp(isLoggedIn: username != null));
   } catch (e) {
-    // Handle initialization errors
-    runApp(MyApp(isLoggedIn: false)); // You can change this behavior
+    runApp(MyApp(isLoggedIn: false)); 
     print("Error initializing Hive: $e");
   }
 }

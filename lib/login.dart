@@ -45,12 +45,17 @@ class _LoginState extends State<Login> {
       );
 
       if (response.statusCode == 200) {
-        var box = await Hive.openBox('userBox');
-        box.put('username', username);
+        var responseData = jsonDecode(response.body);
+      var userId = responseData['id'];
+
+      var box = await Hive.openBox('userBox');
+      box.put('username', username);
+      box.put('userId', userId); 
+
+      print('User ID: $userId');
         Navigator.pushReplacementNamed(context, '/home');
       } else if (response.statusCode == 401) {
         setState(() {
-          // _errorMessage = 'Invalid username or password';
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Invalid username or password")));
         });
