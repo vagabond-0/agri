@@ -1,4 +1,3 @@
-
 import 'package:agri/Component/crop.dart';
 
 import 'package:flutter/material.dart';
@@ -7,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 import 'login.dart';
 import 'Homescreen.dart';
 import 'Register.dart';
+import 'Profile.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,6 +45,7 @@ class MyApp extends StatelessWidget {
         '/': (context) => Login(),
         '/home': (context) => const Homescreen(),
         '/register': (context) => Register(),
+        '/profile': (context) => const Profile()
       },
     );
   }
