@@ -24,8 +24,10 @@ class _LoginState extends State<Login> {
 
     if (username.isEmpty || password.isEmpty) {
       setState(() {
+
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text("Please enter both username and password")));
+
       });
       return;
     }
@@ -45,15 +47,21 @@ class _LoginState extends State<Login> {
       );
 
       if (response.statusCode == 200) {
-        var box = await Hive.openBox('userBox');
-        box.put('username', username);
-        // ignore: use_build_context_synchronously
+
+        var responseData = jsonDecode(response.body);
+      var userId = responseData['id'];
+
+      var box = await Hive.openBox('userBox');
+      box.put('username', username);
+      box.put('userId', userId); 
+
+      print('User ID: $userId');
         Navigator.pushReplacementNamed(context, '/home');
       } else if (response.statusCode == 401) {
         setState(() {
-          // _errorMessage = 'Invalid username or password';
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text("Invalid username or password")));
+              SnackBar(content: Text("Invalid username or password")));
+
         });
       } else {
         setState(() {
@@ -63,7 +71,9 @@ class _LoginState extends State<Login> {
       }
     } catch (e) {
       setState(() {
+
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+
             content: Text(
                 "Error connecting to the server. Please try again later.")));
       });
@@ -78,7 +88,11 @@ class _LoginState extends State<Login> {
         children: [
           Positioned.fill(
             child: Container(
-              decoration: const BoxDecoration(
+
+              decoration: BoxDecoration(
+
+              decoration: BoxDecoration(
+
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -99,7 +113,9 @@ class _LoginState extends State<Login> {
                       style: GoogleFonts.lobster(
                           color: const Color.fromARGB(255, 204, 244, 198),
                           fontSize: 58)),
-                  const SizedBox(height: 40),
+
+                  SizedBox(height: 40),
+
                   if (_errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
@@ -152,8 +168,10 @@ class _LoginState extends State<Login> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 67, 180, 73),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 15),
+
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -168,8 +186,10 @@ class _LoginState extends State<Login> {
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 67, 180, 73),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 40, vertical: 15),
+
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
