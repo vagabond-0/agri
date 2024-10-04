@@ -8,7 +8,6 @@ class Register extends StatefulWidget {
   _RegisterState createState() => _RegisterState();
 }
 
-
 class _RegisterState extends State<Register> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -28,6 +27,7 @@ class _RegisterState extends State<Register> {
 
     final url = Uri.parse('http://localhost:8080/farmer/createFarmer/');
     final body = jsonEncode({
+
       'farmerFirstName': _firstNameController.text,
       'farmerLastName': _lastNameController.text,
       'username': _usernameController.text,

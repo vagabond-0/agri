@@ -1,15 +1,15 @@
 import 'dart:convert';
-import 'dart:ui';
-import 'package:agri/Homescreen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 
 class Login extends StatefulWidget {
+  const Login({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _LoginState createState() => _LoginState();
 }
 
@@ -24,8 +24,10 @@ class _LoginState extends State<Login> {
 
     if (username.isEmpty || password.isEmpty) {
       setState(() {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Please enter both username and password")));
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Please enter both username and password")));
+
       });
       return;
     }
@@ -45,6 +47,7 @@ class _LoginState extends State<Login> {
       );
 
       if (response.statusCode == 200) {
+
         var responseData = jsonDecode(response.body);
       var userId = responseData['id'];
 
@@ -58,6 +61,7 @@ class _LoginState extends State<Login> {
         setState(() {
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("Invalid username or password")));
+
         });
       } else {
         setState(() {
@@ -67,7 +71,9 @@ class _LoginState extends State<Login> {
       }
     } catch (e) {
       setState(() {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+
             content: Text(
                 "Error connecting to the server. Please try again later.")));
       });
@@ -82,7 +88,11 @@ class _LoginState extends State<Login> {
         children: [
           Positioned.fill(
             child: Container(
+
               decoration: BoxDecoration(
+
+              decoration: BoxDecoration(
+
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
@@ -103,75 +113,83 @@ class _LoginState extends State<Login> {
                       style: GoogleFonts.lobster(
                           color: const Color.fromARGB(255, 204, 244, 198),
                           fontSize: 58)),
+
                   SizedBox(height: 40),
+
                   if (_errorMessage.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40),
                       child: Text(
                         _errorMessage,
-                        style: TextStyle(color: Colors.red),
+                        style: const TextStyle(color: Colors.red),
                       ),
                     ),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: TextField(
                       controller: _usernameController,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Username',
-                        hintStyle: TextStyle(color: Colors.white70),
+                        hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.2),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
                         ),
-                        prefixIcon: Icon(Icons.person, color: Colors.white70),
+                        prefixIcon:
+                            const Icon(Icons.person, color: Colors.white70),
                       ),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
                     child: TextField(
                       controller: _passwordController,
                       obscureText: true,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Password',
-                        hintStyle: TextStyle(color: Colors.white70),
+                        hintStyle: const TextStyle(color: Colors.white70),
                         filled: true,
                         fillColor: Colors.white.withOpacity(0.2),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(30),
                           borderSide: BorderSide.none,
                         ),
-                        prefixIcon: Icon(Icons.lock, color: Colors.white70),
+                        prefixIcon:
+                            const Icon(Icons.lock, color: Colors.white70),
                       ),
                     ),
                   ),
-                  SizedBox(height: 40),
+                  const SizedBox(height: 40),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 67, 180, 73),
+
                       padding:
                           EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
                     onPressed: _login,
-                    child: Text(
+                    child: const Text(
                       'Login',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 67, 180, 73),
+
                       padding:
                           EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -179,13 +197,13 @@ class _LoginState extends State<Login> {
                     onPressed: () {
                       Navigator.pushNamed(context, '/register');
                     },
-                    child: Text(
+                    child: const Text(
                       'Register',
                       style: TextStyle(fontSize: 18, color: Colors.white),
                     ),
                   ),
-                  SizedBox(height: 60),
-                  Row(
+                  const SizedBox(height: 60),
+                  const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       FaIcon(FontAwesomeIcons.facebook, color: Colors.white),

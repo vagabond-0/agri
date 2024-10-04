@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:geolocator/geolocator.dart';
 
+
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -175,37 +176,55 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  icon: const Icon(
-                    Icons.location_on,
-                    size: 30,
-                    color: Colors.green,
-                  ),
-                  onPressed: () {
-                    _getCurrentLocation(context);
-                  },
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Icon(
+                      Icons.location_on,
+                      size: 30,
+                      color: Colors.green,
+                    ),
+                    Builder(
+                      builder: (context) => PopupMenuButton<String>(
+                        icon: const Icon(Icons.account_circle),
+                        onSelected: (value) async {
+                          if (value == 'Profile') {
+                            Navigator.pushReplacementNamed(context, '/profile');
+                          } else if (value == 'Logout') {
+                            var box = await Hive.openBox('userBox');
+                            await box.delete('username');
+                            await box.close();
+                            if (context.mounted) {
+                              Navigator.of(context).pushNamedAndRemoveUntil(
+                                  '/', (Route<dynamic> route) => false);
+                            }
+                          }
+                        },
+                        itemBuilder: (BuildContext context) {
+                          return {'Profile', 'Logout'}.map((String choice) {
+                            return PopupMenuItem<String>(
+                              value: choice,
+                              child: Text(choice),
+                            );
+                          }).toList();
+                        },
+                      ),
+                    ),
+                  ],
                 ),
-                const Icon(
-                  Icons.account_circle,
-                  size: 30,
-                  color: Colors.green,
-                ),
-              ],
-            ),
-          ),
+              ),
           const CustomHero(),
           _locationAccessed
               ? const TemperatureScreen() 
               : const Text("Enable location to view temperature", style: TextStyle(color: Colors.grey)),
           const CropSuggestion(),
         ],
+
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10.0),
