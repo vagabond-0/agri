@@ -24,7 +24,9 @@ class _CropSuggestionState extends State<CropSuggestion> {
       builder: (context, state) {
         if (state is WeatherSuccess) {
           if (!isFetchingCrops) {
-            fetchCrops(state.weather.temperature);
+            String Temperature = state.weather.temperature.toString();
+            String temperature = Temperature.split(' ')[0];
+            fetchCrops(temperature);
           }
           return buildCropSuggestion();
         } else if (state is WeatherLoading) {
@@ -38,11 +40,7 @@ class _CropSuggestionState extends State<CropSuggestion> {
     );
   }
 
-  Future<void> fetchCrops(Temperature? temperature) async {
-    setState(() {
-      isFetchingCrops = true;
-    });
-
+   Future<void> fetchCrops(String temperature) async {
     final response = await http.get(
       Uri.parse(
           'http://localhost:8080/crop/suggestionByWeatherAndMonth?weather=$temperature&month=${DateTime.now().toIso8601String().substring(0, 10)}'),
@@ -52,12 +50,8 @@ class _CropSuggestionState extends State<CropSuggestion> {
       List jsonResponse = json.decode(response.body);
       setState(() {
         crops = jsonResponse.map((crop) => Crop.fromJson(crop)).toList();
-        isFetchingCrops = false;
       });
     } else {
-      setState(() {
-        isFetchingCrops = false;
-      });
       throw Exception('Failed to load crops');
     }
   }
@@ -141,7 +135,7 @@ class _CropSuggestionState extends State<CropSuggestion> {
           ),
           const SizedBox(height: 4),
           Text(
-            "Time: ${crop.timeRequiredForHarvest} days",
+            "Time: ${crop.TimeRequiredForHarvest} days",
             style: const TextStyle(
               fontSize: 14,
               color: Colors.white,

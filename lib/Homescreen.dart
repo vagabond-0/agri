@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:agri/Component/CropSuggestion.dart';
 import 'package:agri/Component/Hero.dart';
 import 'package:agri/Component/TemperatureScreen.dart';
+import 'package:agri/Component/userscrop.dart';
 import 'package:agri/bloc/weather_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -177,61 +178,64 @@ class _HomescreenState extends State<Homescreen> {
   Widget build(BuildContext context) {
     return Scaffold(
 
-      body: Column(
-        children: [
-          Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    InkWell(
-  onTap: () {
-    // Add your onClick code here
-    _getCurrentLocation(context);
-  },
-  child: const Icon(
-    Icons.location_on,
-    size: 30,
-    color: Colors.green,
-  ),
-),
-
-                    Builder(
-                      builder: (context) => PopupMenuButton<String>(
-                        icon: const Icon(Icons.account_circle),
-                        onSelected: (value) async {
-                          if (value == 'Profile') {
-                            Navigator.pushReplacementNamed(context, '/profile');
-                          } else if (value == 'Logout') {
-                            var box = await Hive.openBox('userBox');
-                            await box.delete('username');
-                            await box.close();
-                            if (context.mounted) {
-                              Navigator.of(context).pushNamedAndRemoveUntil(
-                                  '/', (Route<dynamic> route) => false);
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      InkWell(
+          onTap: () {
+            // Add your onClick code here
+            _getCurrentLocation(context);
+          },
+          child: const Icon(
+            Icons.location_on,
+            size: 30,
+            color: Colors.green,
+          ),
+        ),
+        
+                      Builder(
+                        builder: (context) => PopupMenuButton<String>(
+                          icon: const Icon(Icons.account_circle),
+                          onSelected: (value) async {
+                            if (value == 'Profile') {
+                              Navigator.pushReplacementNamed(context, '/profile');
+                            } else if (value == 'Logout') {
+                              var box = await Hive.openBox('userBox');
+                              await box.delete('username');
+                              await box.close();
+                              if (context.mounted) {
+                                Navigator.of(context).pushNamedAndRemoveUntil(
+                                    '/', (Route<dynamic> route) => false);
+                              }
                             }
-                          }
-                        },
-                        itemBuilder: (BuildContext context) {
-                          return {'Profile', 'Logout'}.map((String choice) {
-                            return PopupMenuItem<String>(
-                              value: choice,
-                              child: Text(choice),
-                            );
-                          }).toList();
-                        },
+                          },
+                          itemBuilder: (BuildContext context) {
+                            return {'Profile', 'Logout'}.map((String choice) {
+                              return PopupMenuItem<String>(
+                                value: choice,
+                                child: Text(choice),
+                              );
+                            }).toList();
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-          const CustomHero(),
-          _locationAccessed
-              ? const TemperatureScreen() 
-              : const Text("Enable location to view temperature", style: TextStyle(color: Colors.grey)),
-          const CropSuggestion(),
-        ],
-
+            const CustomHero(),
+            _locationAccessed
+                ? const TemperatureScreen() 
+                : const Text("Enable location to view temperature", style: TextStyle(color: Colors.grey)),
+            const CropSuggestion(),
+            const UserCrop()
+          ],
+        
+        ),
       ),
       bottomNavigationBar: Padding(
         padding: const EdgeInsets.all(10.0),
