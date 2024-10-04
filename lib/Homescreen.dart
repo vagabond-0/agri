@@ -2,9 +2,12 @@ import 'dart:convert';
 import 'package:agri/Component/CropSuggestion.dart';
 import 'package:agri/Component/Hero.dart';
 import 'package:agri/Component/TemperatureScreen.dart';
+import 'package:agri/bloc/weather_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -16,110 +19,158 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   List<dynamic> crops = [];
   String? selectedCrop;
-  String? farmerId; 
-  DateTime registeredMonth = DateTime.now(); 
+  String? farmerId;
+  DateTime registeredMonth = DateTime.now();
+  Position? _currentPosition;
+  bool _locationAccessed = false;
+  
 
   @override
   void initState() {
     super.initState();
-    _loadFarmerId(); 
+    _loadFarmerId();
     fetchCrops();
   }
 
-  Future<void> _loadFarmerId() async {
-    var box = await Hive.openBox('userBox'); 
+  Future<void> _getCurrentLocation(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Check if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    // Check location permissions
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    // Get the current location
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
     setState(() {
-      farmerId = box.get('userId'); 
+      _currentPosition = position;
+      _locationAccessed = true; // Update state to reflect that location is accessed
+    });
+
+    // Fetch weather data using the location
+    context.read<WeatherBloc>().add(Fetchweather(position));
+  }
+
+  Future<void> _loadFarmerId() async {
+    var box = await Hive.openBox('userBox');
+    setState(() {
+      farmerId = box.get('userId');
     });
   }
 
   Future<void> fetchCrops() async {
-    final response = await http.get(Uri.parse('http://localhost:8080/crop/getcrop'));
+    try {
+      final response = await http.get(Uri.parse('http://localhost:8080/crop/getcrop'));
 
-    if (response.statusCode == 200) {
-      setState(() {
-        crops = jsonDecode(response.body);
-      });
-    } else {
-      throw Exception('Failed to load crops');
+      if (response.statusCode == 200) {
+        setState(() {
+          crops = jsonDecode(response.body);
+        });
+      } else {
+        throw Exception('Failed to load crops');
+      }
+    } catch (e) {
+      print('Error fetching crops: $e');
     }
   }
 
   Future<void> registerCrop(String cropId) async {
-    final response = await http.post(
-      Uri.parse('http://localhost:8080/Register'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        'farmerId': farmerId, 
-        'cropId': cropId,
-        'registeredMonth': registeredMonth.toIso8601String().split("T")[0], 
-      }),
-    );
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:8080/Register'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'farmerId': farmerId,
+          'cropId': cropId,
+          'registeredMonth': registeredMonth.toIso8601String().split("T")[0],
+        }),
+      );
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      print('Crop registered successfully');
-    } else {
-      throw Exception('Failed to register crop');
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print('Crop registered successfully');
+      } else {
+        throw Exception('Failed to register crop');
+      }
+    } catch (e) {
+      print('Error registering crop: $e');
     }
   }
 
   void _showAddCropDialog() {
-  String? localSelectedCrop;
-  String selectedCropName = "Select a Crop";
+    String? localSelectedCrop;
+    String selectedCropName = "Select a Crop";
 
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: const Text("Select a Crop"),
-            content: DropdownButton<String>(
-              isExpanded: true,
-              value: localSelectedCrop,
-              hint: Text(selectedCropName),
-              onChanged: (String? newValue) {
-                setState(() {
-                  localSelectedCrop = newValue;
-                  selectedCropName = crops.firstWhere((crop) => crop['id'] == newValue)['cropName'];
-                  debugPrint("Selected Crop ID: $localSelectedCrop");
-                });
-              },
-              items: crops.map<DropdownMenuItem<String>>((crop) {
-                return DropdownMenuItem<String>(
-                  value: crop['id'],
-                  child: Text(crop['cropName']),
-                );
-              }).toList(),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text("Cancel"),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-              TextButton(
-                child: const Text("OK"),
-                onPressed: () {
-                  if (localSelectedCrop != null) {
-                    registerCrop(localSelectedCrop!);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Select a Crop"),
+              content: DropdownButton<String>(
+                isExpanded: true,
+                value: localSelectedCrop,
+                hint: Text(selectedCropName),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    localSelectedCrop = newValue;
+                    selectedCropName = crops.firstWhere((crop) => crop['id'] == newValue)['cropName'];
                     debugPrint("Selected Crop ID: $localSelectedCrop");
-                    Navigator.of(context).pop();
-                  } else {
-                    debugPrint("No crop selected");
-                  }
+                  });
                 },
+                items: crops.map<DropdownMenuItem<String>>((crop) {
+                  return DropdownMenuItem<String>(
+                    value: crop['id'],
+                    child: Text(crop['cropName']),
+                  );
+                }).toList(),
               ),
-            ],
-          );
-        },
-      );
-    },
-  );
-}
+              actions: <Widget>[
+                TextButton(
+                  child: const Text("Cancel"),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text("OK"),
+                  onPressed: () {
+                    if (localSelectedCrop != null) {
+                      registerCrop(localSelectedCrop!);
+                      debugPrint("Selected Crop ID: $localSelectedCrop");
+                      Navigator.of(context).pop();
+                    } else {
+                      debugPrint("No crop selected");
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,22 +181,29 @@ class _HomescreenState extends State<Homescreen> {
             padding: const EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Icon(
-                  Icons.location_on,
-                  size: 30,
-                  color: Colors.green,
+              children: [
+                IconButton(
+                  icon: const Icon(
+                    Icons.location_on,
+                    size: 30,
+                    color: Colors.green,
+                  ),
+                  onPressed: () {
+                    _getCurrentLocation(context);
+                  },
                 ),
-                Icon(
+                const Icon(
                   Icons.account_circle,
                   size: 30,
                   color: Colors.green,
-                )
+                ),
               ],
             ),
           ),
           const CustomHero(),
-          const Temperaturescreen(),
+          _locationAccessed
+              ? const TemperatureScreen() 
+              : const Text("Enable location to view temperature", style: TextStyle(color: Colors.grey)),
           const CropSuggestion(),
         ],
       ),
@@ -153,7 +211,7 @@ class _HomescreenState extends State<Homescreen> {
         padding: const EdgeInsets.all(10.0),
         child: ElevatedButton(
           onPressed: () {
-            _showAddCropDialog(); 
+            _showAddCropDialog();
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.green,
