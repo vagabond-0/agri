@@ -88,9 +88,6 @@ class _LoginState extends State<Login> {
         children: [
           Positioned.fill(
             child: Container(
-
-              decoration: BoxDecoration(
-
               decoration: BoxDecoration(
 
                 gradient: LinearGradient(

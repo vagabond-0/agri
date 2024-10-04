@@ -58,16 +58,10 @@ class MyApp extends StatelessWidget {
           '/': (context) => Login(),
           '/home': (context) => Homescreen(),
           '/register': (context) => Register(),
+          '/profile':(context) => Profile()
         },
       ),
-
-      initialRoute: isLoggedIn ? '/home' : '/',
-      routes: {
-        '/': (context) => Login(),
-        '/home': (context) => const Homescreen(),
-        '/register': (context) => Register(),
-        '/profile': (context) => const Profile()
-      },
+      
 
     );
   }

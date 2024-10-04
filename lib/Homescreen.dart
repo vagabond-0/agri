@@ -184,11 +184,18 @@ class _HomescreenState extends State<Homescreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(
-                      Icons.location_on,
-                      size: 30,
-                      color: Colors.green,
-                    ),
+                    InkWell(
+  onTap: () {
+    // Add your onClick code here
+    _getCurrentLocation(context);
+  },
+  child: const Icon(
+    Icons.location_on,
+    size: 30,
+    color: Colors.green,
+  ),
+),
+
                     Builder(
                       builder: (context) => PopupMenuButton<String>(
                         icon: const Icon(Icons.account_circle),
