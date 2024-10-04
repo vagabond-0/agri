@@ -1,5 +1,4 @@
 import 'package:agri/Component/crop.dart';
-
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
@@ -8,9 +7,7 @@ import 'login.dart';
 import 'Homescreen.dart';
 import 'Register.dart';
 import 'Profile.dart';
-
-import 'bloc/weather_bloc.dart'; 
-
+import 'bloc/weather_bloc.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,11 +24,7 @@ Future<bool> _initializeHive() async {
     var box = Hive.box('userBox');
     String? username = box.get('username');
 
-    runApp(MyApp(isLoggedIn: username != null));
-
-    
     return username != null;
-
   } catch (e) {
     print("Error initializing Hive: $e");
     return false;
@@ -46,7 +39,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => WeatherBloc(), // Replace with your bloc
+      create: (context) => WeatherBloc(),
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Agro App',
@@ -54,15 +47,22 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         initialRoute: isLoggedIn ? '/home' : '/',
+        onGenerateRoute: (settings) {
+          if (settings.name!.startsWith('/crop/')) {
+            final cropId = settings.name!.split('/').last;
+            return MaterialPageRoute(
+              builder: (context) => AgroMonitoringPage(cropId: cropId),
+            );
+          }
+          return null;
+        },
         routes: {
           '/': (context) => Login(),
           '/home': (context) => Homescreen(),
           '/register': (context) => Register(),
-          '/profile':(context) => Profile()
+          '/profile': (context) => Profile(),
         },
       ),
-      
-
     );
   }
 }

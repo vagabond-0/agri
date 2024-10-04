@@ -99,49 +99,54 @@ class _CropSuggestionState extends State<CropSuggestion> {
   }
 
   Widget cropCard(Crop crop) {
-    return Container(
-      width: 120,
-      height: 200,
-      margin: const EdgeInsets.only(right: 16),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: Colors.lightBlueAccent,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(
-            Icons.wb_sunny,
-            size: 40,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            crop.cropName,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "${crop.weatherStart}°C - ${crop.weatherEnd}°C",
-            style: const TextStyle(
-              fontSize: 16,
+    return GestureDetector(
+       onTap: () {
+        Navigator.pushNamed(context, '/crop/${crop.id}');
+      },
+      child: Container(
+        width: 120,
+        height: 200,
+        margin: const EdgeInsets.only(right: 16),
+        padding: const EdgeInsets.all(16.0),
+        decoration: BoxDecoration(
+          color: Colors.lightBlueAccent,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(
+              Icons.wb_sunny,
+              size: 40,
               color: Colors.white,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "Time: ${crop.TimeRequiredForHarvest} days",
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
+            const SizedBox(height: 8),
+            Text(
+              crop.cropName,
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              "${crop.weatherStart}°C - ${crop.weatherEnd}°C",
+              style: const TextStyle(
+                fontSize: 16,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              "Time: ${crop.TimeRequiredForHarvest} days",
+              style: const TextStyle(
+                fontSize: 14,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

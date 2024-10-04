@@ -1,234 +1,131 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:agri/models/CropModel.dart'; // Make sure this import is correct
 
-class AgroMonitoringPage extends StatelessWidget {
+class AgroMonitoringPage extends StatefulWidget {
+  final String cropId;
+
+  const AgroMonitoringPage({Key? key, required this.cropId}) : super(key: key);
+
+  @override
+  _AgroMonitoringPageState createState() => _AgroMonitoringPageState();
+}
+
+class _AgroMonitoringPageState extends State<AgroMonitoringPage> {
+  late Future<Crop> futureCrop;
+
+  @override
+  void initState() {
+    super.initState();
+    futureCrop = fetchCropDetails();
+  }
+
+  Future<Crop> fetchCropDetails() async {
+    final response = await http.get(Uri.parse('http://localhost:8080/crop/${widget.cropId}'));
+
+    if (response.statusCode == 200) {
+      return Crop.fromJson(json.decode(response.body));
+    } else {
+      throw Exception('Failed to load crop details');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F0E6), // Light natural color
-      body: SingleChildScrollView(
+      backgroundColor: const Color(0xFFF5F0E6),
+      body: FutureBuilder<Crop>(
+        future: futureCrop,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.hasData) {
+            return _buildCropDetails(snapshot.data!);
+          } else {
+            return Center(child: Text('No data available'));
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildCropDetails(Crop crop) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.arrow_back_ios),
+                ),
+                Text(
+                  crop.cropName,
+                  style: GoogleFonts.abel(
+                    color: const Color.fromARGB(255, 194, 146, 24),
+                    fontSize: 35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            height: 250,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16.0),
+              image: const DecorationImage(
+                image: AssetImage('assets/images/wheat.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+          _buildInfoCard('Temperature', '${crop.weatherStart}°C - ${crop.weatherEnd}°C', Icons.thermostat),
+          _buildInfoCard('Humidity', '${crop.humidityStart}% - ${crop.humidityEnd}%', Icons.water_drop),
+          _buildInfoCard('Market Price', '₹${crop.marketPrice}/kg', Icons.currency_rupee),
+          _buildInfoCard('Soil Moisture', '${crop.soilMoisture}%', Icons.water),
+          _buildInfoCard('Soil Type', crop.soilType, Icons.landscape),
+          _buildInfoCard('Soil pH', crop.soilPh.toString(), Icons.science),
+          _buildInfoCard('Harvest Time', '${crop.TimeRequiredForHarvest} days', Icons.access_time),
+          _buildInfoCard('Suitable Months', '${crop.suitableMonthStart} - ${crop.suitableMonthEnd}', Icons.calendar_today),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoCard(String title, String value, IconData icon) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16.0),
+      ),
+      child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            BlockSemantics(
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back_ios)),
-                    Text('Wheat ',
-                        style: GoogleFonts.abel(
-                            color: const Color.fromARGB(255, 194, 146, 24),
-                            fontSize: 35)),
-                  ],
-                ),
+            Text(
+              title,
+              style: GoogleFonts.abel(
+                color: const Color.fromARGB(255, 194, 146, 24),
+                fontSize: 20,
               ),
             ),
-            // Top Image Section
-            Container(
-              height: 250,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16.0),
-                image: const DecorationImage(
-                  image: AssetImage('assets/images/wheat.jpg'),
-                  fit: BoxFit.cover,
-                ),
-              ),
+            Row(
+              children: [
+                Text(value, style: TextStyle(fontSize: 16)),
+                SizedBox(width: 10),
+                Icon(icon, size: 18),
+              ],
             ),
-            const SizedBox(height: 20),
-
-            // Data Cards
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Temperature ',
-                        style: GoogleFonts.abel(
-                            color: const Color.fromARGB(255, 194, 146, 24),
-                            fontSize: 20)),
-                    Container(
-                      child: Row(
-                        children: [
-                          const Text("34*", style: TextStyle(fontSize: 16)),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.sunny)
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Humidity ',
-                        style: GoogleFonts.abel(
-                            color: const Color.fromARGB(255, 194, 146, 24),
-                            fontSize: 20)),
-                    Container(
-                      child: Row(
-                        children: [
-                          const Text("45%", style: TextStyle(fontSize: 16)),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.water_drop, size: 18)
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Market Price ',
-                        style: GoogleFonts.abel(
-                            color: const Color.fromARGB(255, 194, 146, 24),
-                            fontSize: 20)),
-                    Container(
-                      child: Row(
-                        children: [
-                          const Text("37", style: TextStyle(fontSize: 16)),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.currency_rupee, size: 18)
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Moisture ',
-                        style: GoogleFonts.abel(
-                            color: const Color.fromARGB(255, 194, 146, 24),
-                            fontSize: 20)),
-                    Container(
-                      child: Row(
-                        children: [
-                          const Text("45%", style: TextStyle(fontSize: 16)),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          const Icon(Icons.water_drop, size: 18)
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
-
-            Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Soil Type ',
-                        style: GoogleFonts.abel(
-                            color: const Color.fromARGB(255, 194, 146, 24),
-                            fontSize: 20)),
-                    const Text("", style: TextStyle(fontSize: 16)),
-                  ],
-                ),
-              ),
-            ),
-
-            // List of Crops
-            // GridView.builder(
-            //   shrinkWrap: true,
-            //   physics: NeverScrollableScrollPhysics(),
-            //   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            //     crossAxisCount: 2,
-            //     crossAxisSpacing: 16.0,
-            //     mainAxisSpacing: 16.0,
-            //     childAspectRatio: 0.8,
-            //   ),
-            //   itemCount: 4, // Example crop count
-            //   itemBuilder: (context, index) {
-            //     return Container(
-            //       padding: EdgeInsets.all(16.0),
-            //       decoration: BoxDecoration(
-            //         color: Colors.white,
-            //         borderRadius: BorderRadius.circular(16.0),
-            //         boxShadow: [
-            //           BoxShadow(
-            //             color: Colors.black12,
-            //             blurRadius: 4,
-            //             offset: Offset(2, 2),
-            //           ),
-            //         ],
-            //       ),
-            //       child: Column(
-            //         children: [
-            //           Image.asset('assets/crop_image.png', height: 60),
-            //           SizedBox(height: 10),
-            //           Text(
-            //             "Wheat",
-            //             style: TextStyle(
-            //               fontWeight: FontWeight.bold,
-            //               fontSize: 16,
-            //             ),
-            //           ),
-            //           Text(
-            //             "10 kg/ha",
-            //             style: TextStyle(color: Colors.grey),
-            //           ),
-            //         ],
-            //       ),
-            //     );
-            //   },
-            // ),
           ],
         ),
       ),
