@@ -75,7 +75,7 @@ flutter:
   assets:
    - assets/images/background.jpg
    - assets/images/wheat.jpg
-   - assets/images/profilepic.jpg
+   - assets/images/vagabond2.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,258 +1,234 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class Profile extends StatelessWidget {
-  const Profile({super.key});
+class Profile extends StatefulWidget {
+  final String imageAsset;
+  final String fallbackImageAsset;
+
+  const Profile({
+    Key? key,
+    this.imageAsset = 'assets/images/vagabond2.png',
+    this.fallbackImageAsset = 'assets/images/vagabond2.png',
+  }) : super(key: key);
+
+  @override
+  _ProfileState createState() => _ProfileState();
+}
+
+class _ProfileState extends State<Profile> {
+  String firstName = '';
+  String lastName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserData();
+  }
+
+  Future<void> fetchUserData() async {
+    var box = await Hive.openBox('userBox');
+    String? username = box.get('username');
+
+    if (username != null) {
+      final url = 'http://localhost:8080/farmer/getuser?username=$username';
+
+      try {
+        final response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          setState(() {
+            firstName = data['FarmerFirstName'];
+            lastName = data['FarmerLastName'];
+          });
+        } else {
+          setState(() {
+            firstName = "Error";
+            lastName = "Failed to load data";
+          });
+        }
+      } catch (e) {
+        setState(() {
+          firstName = "Error";
+          lastName = e.toString();
+        });
+      }
+    } else {
+      setState(() {
+        firstName = "Error";
+        lastName = "Username not found";
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 197, 233, 199),
       appBar: AppBar(
+        // backgroundColor: const Color.fromARGB(255, 106, 232, 112),
+        backgroundColor: Theme.of(context).colorScheme.surface,
+
         leading: IconButton(
-            onPressed: () {
-              if (context.mounted) {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    '/home', (Route<dynamic> route) => false);
-              }
-            },
-            icon: Icon(Icons.arrow_back)),
-        title: Center(
-          child: Text(
-            'Profile',
-            style: Theme.of(context).textTheme.headlineSmall,
-            textAlign: TextAlign.center,
-          ),
+          onPressed: () {
+            if (context.mounted) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/home', (Route<dynamic> route) => false);
+            }
+          },
+          icon: Icon(Icons.arrow_back),
+          tooltip: 'Back to Home',
         ),
-        backgroundColor: const Color.fromARGB(255, 247, 255, 247),
+        title: Text(
+          'Profile',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
+        centerTitle: true,
       ),
-      backgroundColor: const Color.fromARGB(255, 247, 255, 247),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(50),
-          child: Column(
-            children: [
-              SizedBox(
-                width: 120,
-                height: 120,
-                child: ClipRRect(
-                  //enter image
-                  borderRadius: BorderRadius.circular(100),
-                  child: Image.asset(
-                    'assets/images/background.jpg',
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 10),
-              //enter name of farmer
-              Text('NameOfFarmer',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-
-              SizedBox(
-                height: 20,
-              ),
-
-              Center(
-                child: IntrinsicWidth(
-                  child: Container(
-                    padding: EdgeInsets.fromLTRB(25, 16, 25, 16),
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Row(
-                          //PHONE NUMBER
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.phone, size: 18, color: Colors.green),
-                            SizedBox(width: 8),
-                            Text('+91 9876543210',
-                                style: Theme.of(context).textTheme.bodyMedium),
-                          ],
-                        ),
-                        const Divider(),
-                        SizedBox(height: 10),
-                        Row(
-                          //LOCATION
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.location_pin,
-                                size: 18, color: Colors.green),
-                            SizedBox(width: 8),
-                            Text('Karikode, Kollam',
-                                style: Theme.of(context).textTheme.bodyMedium),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 20),
-
-              // Farming Details
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Farming Details',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-              ),
-
-              Center(
-                child: Container(
-                  padding: EdgeInsets.all(16),
-                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(Icons.landscape),
-                          SizedBox(width: 8),
-                          Text('Farm Size: 20 acres',
-                              style: Theme.of(context).textTheme.bodyMedium),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Icon(Icons.grass),
-                          SizedBox(width: 8),
-                          Text(
-                            'Soil Type: Loamy',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Icon(Icons.agriculture),
-                          SizedBox(width: 8),
-                          Text(
-                            'Crops Grown: Wheat, Rice',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Icon(Icons.pets),
-                          SizedBox(width: 8),
-                          Text(
-                            'Livestock: 10 cows, 5 goats',
-                            style: Theme.of(context).textTheme.bodyMedium,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-//              const SizedBox(height: 20),
-//              SizedBox(
-//                width: 200,
-//                child:  ElevatedButton(onPressed: (){},
-//                style: ElevatedButton.styleFrom(
-              ///                  backgroundColor: Colors.lightGreen , side: BorderSide.none, shape: const StadiumBorder()),
-//              child: const Text('Edit Profile', style: TextStyle(color: Colors.white),)) ,
-              //             ),
-              const SizedBox(height: 30),
-              const Divider(),
-              const SizedBox(height: 10),
-
-              //menu
-
-              ExpansionTile(
-                leading: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(100),
-                    color: Colors.green.withOpacity(0.1),
-                  ),
-                  child: const Icon(Icons.settings, color: Colors.green),
-                ),
-                title: Text('Settings',
-                    style: Theme.of(context).textTheme.bodyMedium),
-                trailing:
-                    Icon(Icons.arrow_drop_down, size: 24.0, color: Colors.grey),
-                children: <Widget>[
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        ListTile(
-                          title: Text('Edit Profile'),
-                          onTap: () {},
-                        ),
-                        ListTile(
-                          title: Text(
-                            'Log Out',
-                            style: TextStyle(
-                              color: Colors.red,
-                            ),
-                          ),
-                          onTap: () {},
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              )
-            ],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildProfileImage(context),
+                SizedBox(height: 16),
+                _buildNameWidget(context),
+                SizedBox(height: 24),
+                _buildContactInfo(context),
+                SizedBox(height: 24),
+                _buildFarmingDetails(context),
+                SizedBox(height: 24),
+                _buildSettingsMenu(context),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+  Widget _buildProfileImage(BuildContext context) {
+    return CircleAvatar(
+      radius: 60,
+      backgroundColor: Colors.grey[300],
+      child: ClipOval(
+        child: Image.asset(
+          widget.imageAsset,
+          width: 120,
+          height: 120,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            print("Error loading image: $error");
+            return Image.asset(
+              widget.fallbackImageAsset,
+              width: 120,
+              height: 120,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                print("Error loading fallback image: $error");
+                return Icon(
+                  Icons.person,
+                  size: 60,
+                  color: Colors.grey[600],
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildNameWidget(BuildContext context) {
+    return Text(
+      '$firstName $lastName',
+      style: Theme.of(context)
+          .textTheme
+          .headlineSmall
+          ?.copyWith(fontWeight: FontWeight.w600),
+    );
+  }
+
+  Widget _buildContactInfo(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            _buildInfoRow(context, Icons.phone, '+91 9876543210'),
+            Divider(),
+            _buildInfoRow(context, Icons.location_on, 'Karikode, Kollam'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(BuildContext context, IconData icon, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          Icon(icon, color: Theme.of(context).primaryColor),
+          SizedBox(width: 16),
+          Expanded(
+              child: Text(text, style: Theme.of(context).textTheme.bodyLarge)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFarmingDetails(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Farming Details',
+                style: Theme.of(context).textTheme.titleLarge),
+            SizedBox(height: 16),
+            _buildInfoRow(context, Icons.landscape, 'Farm Size: 20 acres'),
+            _buildInfoRow(context, Icons.grass, 'Soil Type: Loamy'),
+            _buildInfoRow(
+                context, Icons.agriculture, 'Crops Grown: Wheat, Rice'),
+            _buildInfoRow(context, Icons.pets, 'Livestock: 10 cows, 5 goats'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingsMenu(BuildContext context) {
+    return ExpansionTile(
+      leading: CircleAvatar(
+        backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+        child: Icon(Icons.settings, color: Theme.of(context).primaryColor),
+      ),
+      title: Text('Settings', style: Theme.of(context).textTheme.titleMedium),
+      children: [
+        ListTile(
+          title: Text('Edit Profile'),
+          onTap: () {
+            // TODO: Implement edit profile functionality
+          },
+        ),
+        ListTile(
+          title: Text('Log Out', style: TextStyle(color: Colors.red)),
+          onTap: () async {
+            var box = await Hive.openBox('userBox');
+            await box.delete('username');
+            await box.close();
+            if (context.mounted) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                  '/', (Route<dynamic> route) => false);
+            }
+          },
+        ),
+      ],
+    );
+  }
 }
-
-
-
-// color scheme monochromatic
-// #4ac479 and #4ac479
