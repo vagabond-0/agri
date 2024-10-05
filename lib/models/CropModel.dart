@@ -1,7 +1,7 @@
 class Crop {
   final String id;
   final String cropName;
-  final int timeRequiredForHarvest;
+  final int TimeRequiredForHarvest;
   final double weatherStart;
   final double weatherEnd;
   final double humidityStart;
@@ -16,7 +16,7 @@ class Crop {
   Crop({
     required this.id,
     required this.cropName,
-    required this.timeRequiredForHarvest,
+    required this.TimeRequiredForHarvest,
     required this.weatherStart,
     required this.weatherEnd,
     required this.humidityStart,
@@ -33,7 +33,7 @@ class Crop {
     return Crop(
       id: json['id'],
       cropName: json['cropName'],
-      timeRequiredForHarvest: json['TimeRequiredForHarvest'],
+      TimeRequiredForHarvest: json['TimeRequiredForHarvest'],
       weatherStart: json['weatherStart'],
       weatherEnd: json['weatherEnd'],
       humidityStart: json['humidityStart'],
