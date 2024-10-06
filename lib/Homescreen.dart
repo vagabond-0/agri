@@ -10,7 +10,6 @@ import 'package:http/http.dart' as http;
 import 'package:hive/hive.dart';
 import 'package:geolocator/geolocator.dart';
 
-
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -25,7 +24,6 @@ class _HomescreenState extends State<Homescreen> {
   DateTime registeredMonth = DateTime.now();
   Position? _currentPosition;
   bool _locationAccessed = false;
-  
 
   @override
   void initState() {
@@ -64,7 +62,8 @@ class _HomescreenState extends State<Homescreen> {
 
     setState(() {
       _currentPosition = position;
-      _locationAccessed = true; // Update state to reflect that location is accessed
+      _locationAccessed =
+          true; // Update state to reflect that location is accessed
     });
 
     // Fetch weather data using the location
@@ -80,7 +79,8 @@ class _HomescreenState extends State<Homescreen> {
 
   Future<void> fetchCrops() async {
     try {
-      final response = await http.get(Uri.parse('http://localhost:8080/crop/getcrop'));
+      final response =
+          await http.get(Uri.parse('http://localhost:8080/crop/getcrop'));
 
       if (response.statusCode == 200) {
         setState(() {
@@ -136,7 +136,8 @@ class _HomescreenState extends State<Homescreen> {
                 onChanged: (String? newValue) {
                   setState(() {
                     localSelectedCrop = newValue;
-                    selectedCropName = crops.firstWhere((crop) => crop['id'] == newValue)['cropName'];
+                    selectedCropName = crops.firstWhere(
+                        (crop) => crop['id'] == newValue)['cropName'];
                     debugPrint("Selected Crop ID: $localSelectedCrop");
                   });
                 },
@@ -177,64 +178,66 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: SingleChildScrollView(
         child: Column(
           children: [
             Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-          onTap: () {
-            // Add your onClick code here
-            _getCurrentLocation(context);
-          },
-          child: const Icon(
-            Icons.location_on,
-            size: 30,
-            color: Colors.green,
-          ),
-        ),
-        
-                      Builder(
-                        builder: (context) => PopupMenuButton<String>(
-                          icon: const Icon(Icons.account_circle),
-                          onSelected: (value) async {
-                            if (value == 'Profile') {
-                              Navigator.pushReplacementNamed(context, '/profile');
-                            } else if (value == 'Logout') {
-                              var box = await Hive.openBox('userBox');
-                              await box.delete('username');
-                              await box.close();
-                              if (context.mounted) {
-                                Navigator.of(context).pushNamedAndRemoveUntil(
-                                    '/', (Route<dynamic> route) => false);
-                              }
-                            }
-                          },
-                          itemBuilder: (BuildContext context) {
-                            return {'Profile', 'Logout'}.map((String choice) {
-                              return PopupMenuItem<String>(
-                                value: choice,
-                                child: Text(choice),
-                              );
-                            }).toList();
-                          },
-                        ),
-                      ),
-                    ],
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  InkWell(
+                    onTap: () {
+                      // Add your onClick code here
+                      _getCurrentLocation(context);
+                    },
+                    child: const Icon(
+                      Icons.location_on,
+                      size: 30,
+                      color: Color.fromARGB(255, 116, 194, 118),
+                    ),
                   ),
-                ),
+                  Builder(
+                    builder: (context) => PopupMenuButton<String>(
+                      icon: const Icon(
+                        Icons.account_circle,
+                        size: 30,
+                        color: Color.fromARGB(255, 116, 194, 118),
+                      ),
+                      onSelected: (value) async {
+                        if (value == 'Profile') {
+                          Navigator.pushReplacementNamed(context, '/profile');
+                        } else if (value == 'Logout') {
+                          var box = await Hive.openBox('userBox');
+                          await box.delete('username');
+                          await box.close();
+                          if (context.mounted) {
+                            Navigator.of(context).pushNamedAndRemoveUntil(
+                                '/', (Route<dynamic> route) => false);
+                          }
+                        }
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return {'Profile', 'Logout'}.map((String choice) {
+                          return PopupMenuItem<String>(
+                            value: choice,
+                            child: Text(choice),
+                          );
+                        }).toList();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
             const CustomHero(),
             _locationAccessed
-                ? const TemperatureScreen() 
-                : const Text("Enable location to view temperature", style: TextStyle(color: Colors.grey)),
+                ? const TemperatureScreen()
+                : const Text("Enable location to view temperature",
+                    style: TextStyle(color: Colors.grey)),
             const CropSuggestion(),
             const UserCrop()
           ],
-        
         ),
       ),
       bottomNavigationBar: Padding(
@@ -244,7 +247,7 @@ class _HomescreenState extends State<Homescreen> {
             _showAddCropDialog();
           },
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
+            backgroundColor: const Color.fromARGB(255, 116, 194, 118),
             padding: const EdgeInsets.symmetric(vertical: 15.0),
           ),
           child: const Text(

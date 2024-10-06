@@ -77,7 +77,7 @@ class _ProfileState extends State<Profile> {
                   '/home', (Route<dynamic> route) => false);
             }
           },
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           tooltip: 'Back to Home',
         ),
         title: Text(
@@ -129,10 +129,10 @@ class _ProfileState extends State<Profile> {
               fit: BoxFit.cover,
               errorBuilder: (context, error, stackTrace) {
                 print("Error loading fallback image: $error");
-                return Icon(
+                return const Icon(
                   Icons.person,
                   size: 60,
-                  color: Colors.grey[600],
+                  color: Color.fromARGB(255, 88, 168, 82),
                 );
               },
             );
