@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:agri/models/CropModel.dart'; // Make sure this import is correct
+import 'package:agri/models/CropModel.dart';
 
-class AgroMonitoringPage extends StatefulWidget {
+class CropDetailPage extends StatefulWidget {
   final String cropId;
 
-  const AgroMonitoringPage({Key? key, required this.cropId}) : super(key: key);
+  const CropDetailPage({Key? key, required this.cropId}) : super(key: key);
 
   @override
-  _AgroMonitoringPageState createState() => _AgroMonitoringPageState();
+  _CropDetailPageState createState() => _CropDetailPageState();
 }
 
-class _AgroMonitoringPageState extends State<AgroMonitoringPage> {
+class _CropDetailPageState extends State<CropDetailPage> {
   late Future<Crop> futureCrop;
 
   @override
@@ -97,6 +97,7 @@ class _AgroMonitoringPageState extends State<AgroMonitoringPage> {
           _buildInfoCard('Soil pH', crop.soilPh.toString(), Icons.science),
           _buildInfoCard('Harvest Time', '${crop.timeRequiredForHarvest} days', Icons.access_time),
           _buildInfoCard('Suitable Months', '${crop.suitableMonthStart} - ${crop.suitableMonthEnd}', Icons.calendar_today),
+          // _buildInfoCard('Remaining Days Until Harvest', '${crop.}', Icons.hourglass_bottom),
         ],
       ),
     );

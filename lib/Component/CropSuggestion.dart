@@ -139,7 +139,7 @@ class _CropSuggestionState extends State<CropSuggestion> {
             ),
             const SizedBox(height: 4),
             Text(
-              "Time: ${crop.TimeRequiredForHarvest} days",
+              "Time: ${crop.timeRequiredForHarvest} days",
               style: const TextStyle(
                 fontSize: 14,
                 color: Colors.white,

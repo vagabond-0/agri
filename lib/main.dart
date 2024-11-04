@@ -1,3 +1,4 @@
+import 'package:agri/Component/UsercropPage.dart';
 import 'package:agri/Component/crop.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -53,6 +54,13 @@ class MyApp extends StatelessWidget {
             return MaterialPageRoute(
               builder: (context) => AgroMonitoringPage(cropId: cropId),
             );
+          }else{
+            if(settings.name!.startsWith('/usercrop/')){
+              final cropId = settings.name!.split('/').last;
+            return MaterialPageRoute(
+              builder: (context) => CropDetailPage(cropId: cropId),
+            );
+            }
           }
           return null;
         },
