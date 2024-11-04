@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:agri/models/CropModel.dart';
+import 'package:agri/models/usercropModel.dart';
 
 class CropDetailPage extends StatefulWidget {
   final String cropId;
@@ -14,7 +14,7 @@ class CropDetailPage extends StatefulWidget {
 }
 
 class _CropDetailPageState extends State<CropDetailPage> {
-  late Future<Crop> futureCrop;
+  late Future<UserCrop> futureCrop;
 
   @override
   void initState() {
@@ -22,11 +22,11 @@ class _CropDetailPageState extends State<CropDetailPage> {
     futureCrop = fetchCropDetails();
   }
 
-  Future<Crop> fetchCropDetails() async {
+  Future<UserCrop> fetchCropDetails() async {
     final response = await http.get(Uri.parse('http://localhost:8080/crop/${widget.cropId}'));
 
     if (response.statusCode == 200) {
-      return Crop.fromJson(json.decode(response.body));
+      return UserCrop.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to load crop details');
     }
@@ -36,7 +36,7 @@ class _CropDetailPageState extends State<CropDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F0E6),
-      body: FutureBuilder<Crop>(
+      body: FutureBuilder<UserCrop>(
         future: futureCrop,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -53,7 +53,7 @@ class _CropDetailPageState extends State<CropDetailPage> {
     );
   }
 
-  Widget _buildCropDetails(Crop crop) {
+  Widget _buildCropDetails(UserCrop crop) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -92,9 +92,8 @@ class _CropDetailPageState extends State<CropDetailPage> {
           _buildInfoCard('Temperature', '${crop.weatherStart}°C - ${crop.weatherEnd}°C', Icons.thermostat),
           _buildInfoCard('Humidity', '${crop.humidityStart}% - ${crop.humidityEnd}%', Icons.water_drop),
           _buildInfoCard('Market Price', '₹${crop.marketPrice}/kg', Icons.currency_rupee),
-          _buildInfoCard('Soil Moisture', '${crop.soilMoisture}%', Icons.water),
-          _buildInfoCard('Soil Type', crop.soilType, Icons.landscape),
-          _buildInfoCard('Soil pH', crop.soilPh.toString(), Icons.science),
+          _buildInfoCard('Days remaining to harvest:', '${crop.daysRemaining}', Icons.water),
+          _buildInfoCard('Watering', crop.timeWater, Icons.landscape),
           _buildInfoCard('Harvest Time', '${crop.timeRequiredForHarvest} days', Icons.access_time),
           _buildInfoCard('Suitable Months', '${crop.suitableMonthStart} - ${crop.suitableMonthEnd}', Icons.calendar_today),
           // _buildInfoCard('Remaining Days Until Harvest', '${crop.}', Icons.hourglass_bottom),

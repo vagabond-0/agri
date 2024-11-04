@@ -97,6 +97,8 @@ class _AgroMonitoringPageState extends State<AgroMonitoringPage> {
           _buildInfoCard('Soil pH', crop.soilPh.toString(), Icons.science),
           _buildInfoCard('Harvest Time', '${crop.timeRequiredForHarvest} days', Icons.access_time),
           _buildInfoCard('Suitable Months', '${crop.suitableMonthStart} - ${crop.suitableMonthEnd}', Icons.calendar_today),
+          _buildInfoCard('Suitable Months', '${crop.suitableMonthStart} - ${crop.suitableMonthEnd}', Icons.calendar_today),
+          
         ],
       ),
     );
