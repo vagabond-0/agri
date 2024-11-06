@@ -92,7 +92,7 @@ class _CropDetailPageState extends State<CropDetailPage> {
           _buildInfoCard('Temperature', '${crop.weatherStart}°C - ${crop.weatherEnd}°C', Icons.thermostat),
           _buildInfoCard('Humidity', '${crop.humidityStart}% - ${crop.humidityEnd}%', Icons.water_drop),
           _buildInfoCard('Market Price', '₹${crop.marketPrice}/kg', Icons.currency_rupee),
-          _buildInfoCard('Days remaining to harvest:', '${crop.daysRemaining}', Icons.water),
+          _buildInfoCard('When to Harvest:', '${crop.whenToHarvest}', Icons.water),
           _buildInfoCard('Watering', crop.timeWater, Icons.landscape),
           _buildInfoCard('Harvest Time', '${crop.timeRequiredForHarvest} days', Icons.access_time),
           _buildInfoCard('Suitable Months', '${crop.suitableMonthStart} - ${crop.suitableMonthEnd}', Icons.calendar_today),

@@ -177,7 +177,7 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
+      backgroundColor: const Color.fromARGB(255, 197, 233, 199),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -238,21 +238,42 @@ class _HomescreenState extends State<Homescreen> {
         ),
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ElevatedButton(
-          onPressed: () {
-            _showAddCropDialog();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green,
-            padding: const EdgeInsets.symmetric(vertical: 15.0),
-          ),
-          child: const Text(
-            'Add Crop',
-            style: TextStyle(fontSize: 18),
-          ),
+  padding: const EdgeInsets.all(10.0),
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Space between the buttons
+    children: [
+      // Add Crop button
+      ElevatedButton(
+        onPressed: () {
+          _showAddCropDialog();
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0), // Add horizontal padding for balance
+        ),
+        child: const Text(
+          'Add Crop',
+          style: TextStyle(fontSize: 18),
         ),
       ),
+      // Chatbot button
+      ElevatedButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/chat');
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20.0), // Add horizontal padding for balance
+        ),
+        child: const Text(
+          'Chatbot',
+          style: TextStyle(fontSize: 18),
+        ),
+      ),
+    ],
+  ),
+),
+
     );
   }
 }

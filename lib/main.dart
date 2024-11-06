@@ -1,3 +1,4 @@
+import 'package:agri/Component/Geminichatbot.dart';
 import 'package:agri/Component/UsercropPage.dart';
 import 'package:agri/Component/crop.dart';
 import 'package:flutter/material.dart';
@@ -69,6 +70,7 @@ class MyApp extends StatelessWidget {
           '/home': (context) => Homescreen(),
           '/register': (context) => Register(),
           '/profile': (context) => Profile(),
+          '/chat':(context) =>GeminiChatBot()
         },
       ),
     );

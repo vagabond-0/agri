@@ -1,7 +1,7 @@
 class UserCrop {
   final String id;
   final String cropName;
-  final int timeRequiredForHarvest; // Adjusted field name to camelCase
+  final int timeRequiredForHarvest;
   final double weatherStart;
   final double weatherEnd;
   final double humidityStart;
@@ -12,8 +12,9 @@ class UserCrop {
   final String soilType;
   final double soilPh;
   final double soilMoisture;
-  final String timeWater; // Add this field as a String
-  final int daysRemaining;
+  final String timeWater;
+  final String whenToHarvest;
+
   UserCrop({
     required this.id,
     required this.cropName,
@@ -28,15 +29,15 @@ class UserCrop {
     required this.soilType,
     required this.soilPh,
     required this.soilMoisture,
-    required this.timeWater, 
-    required this.daysRemaining// Include timeWater in the constructor
+    required this.timeWater,
+    required this.whenToHarvest,
   });
 
   factory UserCrop.fromJson(Map<String, dynamic> json) {
     return UserCrop(
       id: json['id'] as String,
       cropName: json['cropName'] as String,
-      timeRequiredForHarvest: json['harvestTime'] as int, // Use harvestTime here
+      timeRequiredForHarvest: json['harvestTime'] as int,
       weatherStart: (json['weatherStart'] as num).toDouble(),
       weatherEnd: (json['weatherEnd'] as num).toDouble(),
       humidityStart: (json['humidityStart'] as num).toDouble(),
@@ -47,8 +48,8 @@ class UserCrop {
       soilType: json['soilType'] as String,
       soilPh: (json['soilPh'] as num).toDouble(),
       soilMoisture: (json['soilMoisture'] as num).toDouble(),
-      timeWater: json['timeWater'] as String, // Deserialize timeWater
-      daysRemaining:json['daysRemaining'] as int
+      timeWater: json['timeWater'] as String,
+      whenToHarvest: json['whenToHarvest'] as String,
     );
   }
 }
